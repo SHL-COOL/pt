@@ -42,3 +42,24 @@ jobs:
           CI_BUILD_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # step5: cleanup artifacts in dist_electron
+      - name: cleanup artifacts
+        run: |
+          npx rimraf "pt-main/!(*.exe|*.dmg)"
+
+      # step6: upload artifacts
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}
+          path: pt-main
+
+      # step7: create release
+      - name: release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: "pt-main/**"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
