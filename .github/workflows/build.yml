@@ -43,10 +43,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # step5: cleanup artifacts in dist_electron
-      - name: cleanup artifacts
+      - name: cleanup artifacts for windows
+        if: matrix.os == 'windows'
         run: |
-          npx rimraf "pt-main/!(*.exe|*.dmg)"
+          npx rimraf "pt-main/!(*.exe)"
+
+      - name: cleanup artifacts for macos
+        if: matrix.os == 'macOS' && matrix.os == 'ubuntu'
+        run: |
+          npx rimraf "pt-main/!(*.dmg)"
 
       # step6: upload artifacts
       - name: upload artifacts
